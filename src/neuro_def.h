@@ -1,0 +1,11 @@
+#ifndef NEURO_DEF_H_78A2D1FB86F34AF38369C27F28E0F54C
+#define NEURO_DEF_H_78A2D1FB86F34AF38369C27F28E0F54C
+
+namespace neuro {
+
+typedef double weight_t;
+typedef double value_t;
+
+}
+
+#endif //NEURO_DEF_H_78A2D1FB86F34AF38369C27F28E0F54C
