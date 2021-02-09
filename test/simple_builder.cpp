@@ -1,6 +1,5 @@
-#include <iostream>
-
-#include "src/simple_builder.h"
+#include <gtest/gtest.h>
+#include "../src/simple_builder.h"
 
 using neuro::simple_builder;
 using neuro::neuro_config;
@@ -8,22 +7,16 @@ using neuro::connection;
 using neuro::neuron;
 using neuro::weight_t;
 
-using std::cout;
-using std::endl;
-
-weight_t rand_weight() {
-  return -10 + rand() % 10;
-}
-
-weight_t rand_bi() {
-  return rand() % 2;
-}
-
-weight_t nand(weight_t w1, weight_t w2) {
-  return !((w1 > 0.5) & (w2 > 0.5));
-}
-
-int main() {
+/**
+ * \test TODO
+ */
+TEST(simple_builder, get_null) {
+  /*   3
+   * 1 4
+   *     7
+   * 2 5
+   *   6
+   */
   vector<std::pair<uintptr_t, uintptr_t>> connections {
       {1, 3},
       {1, 4},
@@ -43,28 +36,24 @@ int main() {
   cfg.in.push_back(2);
   cfg.out.push_back(7);
   connection *conn_p;
+  weight_t i{0};
   for (auto &p : connections) {
     conn_p = new connection;
     conn_p->in = reinterpret_cast<neuron *>(p.first);
     conn_p->out = reinterpret_cast<neuron *>(p.second);
-    conn_p->weight = rand_weight();
+    conn_p->weight = i++;
     cfg.net.push_back(conn_p);
   }
-
   auto *net = simple_builder::build(&cfg);
+  EXPECT_EQ(net->in.size(), 2);
+  EXPECT_EQ(net->in.at(0)->in.size(), 0);
+  EXPECT_EQ(net->in.at(0)->out.size(), 4);
+  EXPECT_EQ(net->in.at(1)->in.size(), 0);
+  EXPECT_EQ(net->in.at(1)->out.size(), 4);
+  EXPECT_EQ(net->out.size(), 1);
+  EXPECT_EQ(net->out.at(0)->out.size(), 0);
+  EXPECT_EQ(net->out.at(0)->in.size(), 4);
 
-  for (int i(0); i < 100; ++i) {
-    net->in.at(0)->value = rand_bi();
-    net->in.at(1)->value = rand_bi();
-    net->process();
-    net->learn(0.01, nand(net->in.at(0)->value, net->in.at(1)->value));
-  }
-  auto w1 = rand_bi();
-  auto w2 = rand_bi();
-  cout << w1 << endl;
-  cout << w2 << endl;
-  net->process();
-  cout << net->out.at(0)->value << endl;
-
-  return 0;
+  EXPECT_EQ(net->in.at(1)->out.at(3)->out->out.at(0)->weight, net->out.at(0)->in.at(3)->weight);
 }
+
