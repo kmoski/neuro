@@ -37,5 +37,10 @@ neuro::neuro_net *neuro::simple_builder::build(neuro::neuro_config *config) {
   for (auto &conn : config->out) {
     net->out.push_back(neurons.at(conn));
   }
+  for (auto &p : neurons) {  // bias neurons
+    if (p.second->in.empty() && (std::find(config->in.begin(), config->in.end(), p.first) == config->in.end())) {
+      p.second->value = 1;
+    }
+  }
   return net;
 }

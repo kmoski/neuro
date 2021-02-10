@@ -58,7 +58,7 @@ class neuro_net {
   vector<neuron *> in{};
   vector<neuron *> out{};
   void process();
-  void learn(const value_t &rate, const value_t &expected);
+  void learn(const value_t &rate, const vector<value_t> &expected);
 };
 
 }
