@@ -2,7 +2,7 @@
 #define BUILDER_H_E4BC7E7C821945779B7BA44065EF8C64
 
 #include <cstdint>
-#include "net.h"
+#include "neural_net.h"
 
 using std::uintptr_t;
 
@@ -16,7 +16,7 @@ struct neuro_config {
 
 class builder {
  public:
-  static net *build(neuro_config *config);
+  static neural_net *build(neuro_config *config);
 };
 
 }

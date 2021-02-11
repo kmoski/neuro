@@ -3,9 +3,9 @@
 
 using std::map;
 
-neuro::net *neuro::builder::build(neuro::neuro_config *config) {
+neuro::neural_net *neuro::builder::build(neuro::neuro_config *config) {
   // TODO(kmosk): check nullptr
-  auto n = new net;
+  auto net = new neural_net;
   map<uintptr_t, neuron *> neurons;
   for (auto &conn : config->connections) {
     const auto &in = reinterpret_cast<uintptr_t>(conn->in);
@@ -32,15 +32,15 @@ neuro::net *neuro::builder::build(neuro::neuro_config *config) {
     conn->out = search_neuron;
   }
   for (auto &conn : config->in) {
-    n->in.push_back(neurons.at(conn));
+    net->in.push_back(neurons.at(conn));
   }
   for (auto &conn : config->out) {
-    n->out.push_back(neurons.at(conn));
+    net->out.push_back(neurons.at(conn));
   }
   for (auto &p : neurons) {  // bias neurons
     if (p.second->in.empty() && (std::find(config->in.begin(), config->in.end(), p.first) == config->in.end())) {
       p.second->value = 1;
     }
   }
-  return n;
+  return net;
 }

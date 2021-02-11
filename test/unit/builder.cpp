@@ -10,8 +10,9 @@ class test_builder : public ::testing::Test {
  public:
   void SetUp() override {};
   void TearDown() override {
-    delete n;
+    delete net;
   };
+
   /**
    * @brief generate config struct for builder
    * @param cfg - pointer to config struct
@@ -35,7 +36,7 @@ class test_builder : public ::testing::Test {
       cfg->connections.push_back(conn_p);
     }
   }
-  net *n{nullptr};
+  neural_net *net{nullptr};  ///> pointer to neural net
 };
 
 /**
@@ -63,19 +64,19 @@ TEST_F(test_builder, common_struct) {
               {4, 7},
               {5, 7},
               {6, 7}});
-  n = builder::build(&cfg);
+  net = builder::build(&cfg);
 
-  ASSERT_EQ(n->in.size(), 2);
-  ASSERT_EQ(n->in.at(0)->in.size(), 0);
-  ASSERT_EQ(n->in.at(0)->out.size(), 4);
-  ASSERT_EQ(n->in.at(1)->in.size(), 0);
-  ASSERT_EQ(n->in.at(1)->out.size(), 4);
+  ASSERT_EQ(net->in.size(), 2);
+  ASSERT_EQ(net->in.at(0)->in.size(), 0);
+  ASSERT_EQ(net->in.at(0)->out.size(), 4);
+  ASSERT_EQ(net->in.at(1)->in.size(), 0);
+  ASSERT_EQ(net->in.at(1)->out.size(), 4);
 
-  ASSERT_EQ(n->out.size(), 1);
-  ASSERT_EQ(n->out.at(0)->out.size(), 0);
-  ASSERT_EQ(n->out.at(0)->in.size(), 4);
+  ASSERT_EQ(net->out.size(), 1);
+  ASSERT_EQ(net->out.at(0)->out.size(), 0);
+  ASSERT_EQ(net->out.at(0)->in.size(), 4);
 
-  ASSERT_EQ(n->in.at(1)->out.at(3)->out->out.at(0)->weight, n->out.at(0)->in.at(3)->weight);
+  ASSERT_EQ(net->in.at(1)->out.at(3)->out->out.at(0)->weight, net->out.at(0)->in.at(3)->weight);
 }
 
 /**
@@ -109,8 +110,8 @@ TEST_F(test_builder, bias) {
               {9, 4},
               {9, 5},
               {9, 6}});
-  n = builder::build(&cfg);
+  net = builder::build(&cfg);
 
-  ASSERT_EQ(n->out.at(0)->in.at(4)->in->value, 1);
-  ASSERT_EQ(n->in.at(0)->out.at(0)->out->in.at(2)->in->value, 1);
+  ASSERT_EQ(net->out.at(0)->in.at(4)->in->value, 1);
+  ASSERT_EQ(net->in.at(0)->out.at(0)->out->in.at(2)->in->value, 1);
 }
