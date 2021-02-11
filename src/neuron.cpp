@@ -1,9 +1,6 @@
 #include "neuron.h"
 #include <cmath>
 
-neuro::neuron_id neuro::neuron::id() {
-  return reinterpret_cast<uintptr_t>(this);
-}
 void neuro::neuron::process() {
   if (!in.empty()) {
     value = 0;
@@ -21,7 +18,7 @@ void neuro::neuron::learn_head(const neuro::value_t &rate, const neuro::value_t 
 }
 void neuro::neuron::learn(const neuro::value_t &rate) {
   if (!in.empty()) {
-    weight_t error{0};
+    value_t error{0};
     for (auto &conn : out) {
       error += conn->weight * conn->out->delta;
     }

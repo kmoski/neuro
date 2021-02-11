@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <cstdint>
-#include "neuro_def.h"
+#include "def.h"
 
 using std::vector;
 
@@ -14,23 +14,22 @@ typedef uintptr_t neuron_id;
 class neuron;
 
 /**
- * @brief Base struct for transporting
+ * @brief Base struct for transporting NN
  */
 struct connection {
-  weight_t weight{0};  ///> Weight of connection
+  value_t weight{0};  ///> Weight of connection
   neuron *out{nullptr};  ///> Connected to
   neuron *in{nullptr};  ///> Connected from
 };
 
 /**
- * @brief Base struct for computing
+ * @brief Base struct for learning NN
  */
 struct neuron {
   vector<connection *> in{};  ///> Input connections
   vector<connection *> out{};  ///> Output connections
   value_t value{0};  ///> Computing value
   value_t delta{0};  ///> Delta weight for learning
-  neuron_id id();
   void process();
   void learn_head(const value_t &rate, const value_t &expected);
   void learn(const value_t &rate);

@@ -1,5 +1,5 @@
-#ifndef NEURO_NET_H_3EC071C551974630B38E639498C837F5
-#define NEURO_NET_H_3EC071C551974630B38E639498C837F5
+#ifndef NET_H_E0E8C382A3A341B6A8CF46679DCB3D70
+#define NET_H_E0E8C382A3A341B6A8CF46679DCB3D70
 
 // Unix
 #include <unistd.h>
@@ -11,7 +11,7 @@ using std::vector;
 
 namespace neuro {
 
-class neuro_net {
+class net {
   /*
    * - Linux, Solaris, AIX, OS X >= 10.4:
    *
@@ -63,4 +63,4 @@ class neuro_net {
 
 }
 
-#endif //NEURO_NET_H_3EC071C551974630B38E639498C837F5
+#endif //NET_H_E0E8C382A3A341B6A8CF46679DCB3D70

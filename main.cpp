@@ -1,25 +1,30 @@
-#include "src/simple_builder.h"
+#include "src/builder.h"
 
-using neuro::simple_builder;
+using neuro::builder;
 using neuro::neuro_config;
 using neuro::connection;
 using neuro::neuron;
-using neuro::weight_t;
+using neuro::value_t;
 
 #include <iostream>
 using std::cout;
 using std::endl;
 
-weight_t rand_weight() {
-  return (rand() % 10) / 10.0;
-  // return ((rand() % 10) / 10.0) - 0.5;
+/**
+ * @brief generate random weight from -0.5 to 0.5
+ * @param sampling - the number of discrete units in the computed area
+ * @return random weight
+ */
+value_t rand_weight(value_t sampling) {
+  auto random = rand();
+  return ((random % int(sampling)) / sampling) - 0.5;
 }
 
-weight_t rand_bi() {
+value_t rand_bi() {
   return rand() % 2;
 }
 
-weight_t nand(weight_t w1, weight_t w2) {
+value_t nand(value_t w1, value_t w2) {
   return !((w1 > 0.5) & (w2 > 0.5));
 }
 
@@ -53,11 +58,11 @@ int main() {
     conn_p = new connection;
     conn_p->in = reinterpret_cast<neuron *>(p.first);
     conn_p->out = reinterpret_cast<neuron *>(p.second);
-    conn_p->weight = rand_weight();
-    cfg.net.push_back(conn_p);
+    conn_p->weight = rand_weight(13);
+    cfg.connections.push_back(conn_p);
   }
 
-  auto *net = simple_builder::build(&cfg);
+  auto *net = builder::build(&cfg);
 
   for (int i(0); i < 100000; ++i) {
     net->in.at(0)->value = rand_bi();
@@ -65,8 +70,8 @@ int main() {
     net->process();
     net->learn(0.1, {nand(net->in.at(0)->value, net->in.at(1)->value)});
   }
-  weight_t w1 = 1;
-  weight_t w2 = 1;
+  value_t w1 = 1;
+  value_t w2 = 1;
   cout << w1 << " !& " << w2 << " = ";
   net->in.at(0)->value = w1;
   net->in.at(1)->value = w2;

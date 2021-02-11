@@ -1,10 +1,10 @@
-#include "neuro_net.h"
+#include "net.h"
 
 using std::move;
 using std::sort;
 
-const long neuro::neuro_net::num_proc_ = sysconf(_SC_NPROCESSORS_ONLN);
-void neuro::neuro_net::process() {
+const long neuro::net::num_proc_ = sysconf(_SC_NPROCESSORS_ONLN);
+void neuro::net::process() {
   vector<neuron *> currents = in;
   vector<neuron *> nexts;
   while (!currents.empty()) {
@@ -22,7 +22,7 @@ void neuro::neuro_net::process() {
     currents.swap(nexts);
   }
 }
-void neuro::neuro_net::learn(const neuro::value_t &rate, const std::vector<neuro::value_t> &expected) {
+void neuro::net::learn(const neuro::value_t &rate, const std::vector<neuro::value_t> &expected) {
   vector<neuron *> currents = out;
   vector<neuron *> nexts;
   {

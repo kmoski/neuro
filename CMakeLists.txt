@@ -7,9 +7,9 @@ set(PROJECT_MAIN_ENTRY main.cpp)
 
 set(PROJECT_SOURCE
     src/neuron.cpp src/neuron.h
-    src/neuro_def.h
-    src/simple_builder.cpp src/simple_builder.h
-    src/neuro_net.cpp src/neuro_net.h)
+    src/def.h
+    src/builder.cpp src/builder.h
+    src/net.cpp src/net.h)
 
 add_executable(${PROJECT_NAME} ${PROJECT_MAIN_ENTRY} ${PROJECT_SOURCE})
 
@@ -24,7 +24,7 @@ set(TEST_MAIN_ENTRY
     test/main.cpp)
 
 set(TEST_SOURCE
-    test/simple_builder.cpp)
+    test/unit/builder.cpp test/unit/net.cpp)
 
 add_executable(${PROJECT_NAME}_test ${TEST_MAIN_ENTRY} ${TEST_SOURCE} ${PROJECT_SOURCE})
 target_include_directories(${PROJECT_NAME}_test PUBLIC
