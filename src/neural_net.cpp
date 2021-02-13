@@ -1,3 +1,4 @@
+#include <cmath>
 #include "neural_net.h"
 
 using std::move;
@@ -55,4 +56,25 @@ void neuro::neural_net::learn(const neuro::value_t &rate, const std::vector<neur
     currents.clear();
     currents.swap(nexts);
   }
+}
+void neuro::neural_net::set_input(const vector<value_t> &expected) {
+  auto size = in.size();
+  for (typeof(size) i{0}; i < size; ++i) {
+    in.at(i)->value = expected.at(i);
+  }
+}
+neuro::value_t neuro::neural_net::mse(const vector<value_t> &expected) {
+  value_t sum_of_squares{0};
+  auto size = out.size();
+  for (typeof(size) i{0}; i < size; ++i) {
+    sum_of_squares = pow(out.at(i)->value - expected.at(i), 2);
+  }
+  return sum_of_squares / value_t(size);
+}
+vector<neuro::value_t> neuro::neural_net::get_output() {
+  vector<value_t> ret;
+  for (auto &output : out) {
+    ret.push_back(output->value);
+  }
+  return move(ret);
 }

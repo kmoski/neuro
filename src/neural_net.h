@@ -58,7 +58,10 @@ class neural_net {
   vector<neuron *> in{};
   vector<neuron *> out{};
   void process();
+  void set_input(const vector<value_t> &expected);
+  vector<value_t> get_output();
   void learn(const value_t &rate, const vector<value_t> &expected);
+  value_t mse(const vector<value_t> &expected);
 };
 
 }

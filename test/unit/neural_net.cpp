@@ -18,15 +18,11 @@ class test_neural_net : public ::testing::Test {
     auto hidden_neuron_5 = new neuron;
     auto hidden_neuron_6 = new neuron;
     auto bias_neuron_7 = new neuron;
-    auto hidden_neuron_8 = new neuron;
-    auto hidden_neuron_9= new neuron;
-    auto hidden_neuron_10 = new neuron;
-    auto bias_neuron_11 = new neuron;
-    auto out_neuron_12 = new neuron;
+    auto out_neuron_8 = new neuron;
 
     net.in.push_back(in_neuron_1);
     net.in.push_back(in_neuron_2);
-    net.out.push_back(out_neuron_12);
+    net.out.push_back(out_neuron_8);
 
     create_connection(in_neuron_1, hidden_neuron_4);
     create_connection(in_neuron_1, hidden_neuron_5);
@@ -38,23 +34,10 @@ class test_neural_net : public ::testing::Test {
     create_connection(bias_neuron_3, hidden_neuron_5, true);
     create_connection(bias_neuron_3, hidden_neuron_6, true);
 
-    create_connection(hidden_neuron_4, hidden_neuron_8);
-    create_connection(hidden_neuron_4, hidden_neuron_9);
-    create_connection(hidden_neuron_4, hidden_neuron_10);
-    create_connection(hidden_neuron_5, hidden_neuron_8);
-    create_connection(hidden_neuron_5, hidden_neuron_9);
-    create_connection(hidden_neuron_5, hidden_neuron_10);
-    create_connection(hidden_neuron_6, hidden_neuron_8);
-    create_connection(hidden_neuron_6, hidden_neuron_9);
-    create_connection(hidden_neuron_6, hidden_neuron_10);
-    create_connection(bias_neuron_7, hidden_neuron_8, true);
-    create_connection(bias_neuron_7, hidden_neuron_9, true);
-    create_connection(bias_neuron_7, hidden_neuron_10, true);
-
-    create_connection(hidden_neuron_8, out_neuron_12);
-    create_connection(hidden_neuron_9, out_neuron_12);
-    create_connection(hidden_neuron_10, out_neuron_12);
-    create_connection(bias_neuron_11, out_neuron_12, true);
+    create_connection(hidden_neuron_4, out_neuron_8);
+    create_connection(hidden_neuron_5, out_neuron_8);
+    create_connection(hidden_neuron_6, out_neuron_8);
+    create_connection(bias_neuron_7, out_neuron_8, true);
   };
   void TearDown() override {};
 
@@ -94,7 +77,9 @@ class test_neural_net : public ::testing::Test {
     }
   }
 
-  static constexpr value_t test_sampling = 13; // TODO(kmosk): comment
+  static constexpr value_t test_sampling = 13; ///> sampling random weight
+  static constexpr value_t min_mse = 0.001;  ///> minimal mean square error
+  static constexpr value_t learning_rate = 0.1;  ///> neural net learning rate
   neural_net net;
 };
 
@@ -102,97 +87,85 @@ class test_neural_net : public ::testing::Test {
  * @test training connections for logic operation and
  */
 TEST_F(test_neural_net, logic_and) {
-  static const unsigned loops = 20000;
-  static const value_t learning_rate = 0.01;
   auto &in_a = net.in.at(0)->value;
   auto &in_b = net.in.at(1)->value;
   auto &out_c = net.out.at(0)->value;
-  for (unsigned i{0}; i < loops; ++i) {
-    in_a = rand_bi();
-    in_b = rand_bi();
+  vector<value_t> expected;
+  do {
+    net.set_input({rand_bi(), rand_bi()});
     net.process();
-    net.learn(learning_rate, {value_t((in_a > 0.5) && (in_b > 0.5))});
-  }
-  in_a = 1;
-  in_b = 1;
+    expected.clear();
+    expected.push_back(value_t((in_a > 0.5) && (in_b > 0.5)));
+    net.learn(learning_rate, expected);
+  } while (net.mse(expected) > min_mse);
+  net.set_input({1, 1});
   net.process();
-  EXPECT_NEAR(out_c, 1, 0.2);
-  in_a = 1;
-  in_b = 0;
+  EXPECT_NEAR(out_c, 1, 0.5);
+  net.set_input({1, 0});
   net.process();
-  EXPECT_NEAR(out_c, 0, 0.2);
-  in_a = 0;
-  in_b = 1;
+  EXPECT_NEAR(out_c, 0, 0.5);
+  net.set_input({0, 1});
   net.process();
-  EXPECT_NEAR(out_c, 0, 0.2);
-  in_a = 0;
-  in_b = 0;
+  EXPECT_NEAR(out_c, 0, 0.5);
+  net.set_input({0, 0});
   net.process();
-  EXPECT_NEAR(out_c, 0, 0.2);
+  EXPECT_NEAR(out_c, 0, 0.5);
 }
 
 /**
  * @test training connections for logic operation or
  */
 TEST_F(test_neural_net, logic_or) {
-  static const unsigned loops = 20000;
-  static const value_t learning_rate = 0.01;
   auto &in_a = net.in.at(0)->value;
   auto &in_b = net.in.at(1)->value;
   auto &out_c = net.out.at(0)->value;
-  for (unsigned i{0}; i < loops; ++i) {
-    in_a = rand_bi();
-    in_b = rand_bi();
+  vector<value_t> expected;
+  do {
+    net.set_input({rand_bi(), rand_bi()});
     net.process();
-    net.learn(learning_rate, {value_t((in_a > 0.5) || (in_b > 0.5))});
-  }
-  in_a = 1;
-  in_b = 1;
+    expected.clear();
+    expected = {value_t((in_a > 0.5) || (in_b > 0.5))};
+    net.learn(learning_rate, expected);
+  } while (net.mse(expected) > min_mse);
+  net.set_input({1, 1});
   net.process();
-  EXPECT_NEAR(out_c, 1, 0.2);
-  in_a = 1;
-  in_b = 0;
+  EXPECT_NEAR(out_c, 1, 0.5);
+  net.set_input({1, 0});
   net.process();
-  EXPECT_NEAR(out_c, 1, 0.2);
-  in_a = 0;
-  in_b = 1;
+  EXPECT_NEAR(out_c, 1, 0.5);
+  net.set_input({0, 1});
   net.process();
-  EXPECT_NEAR(out_c, 1, 0.2);
-  in_a = 0;
-  in_b = 0;
+  EXPECT_NEAR(out_c, 1, 0.5);
+  net.set_input({0, 0});
   net.process();
-  EXPECT_NEAR(out_c, 0, 0.2);
+  EXPECT_NEAR(out_c, 0, 0.5);
 }
 
 /**
  * @test training connections for logic operation xor
  */
 TEST_F(test_neural_net, logic_xor) {
-  static const unsigned loops = 20000;
-  static const value_t learning_rate = 0.01;
   auto &in_a = net.in.at(0)->value;
   auto &in_b = net.in.at(1)->value;
   auto &out_c = net.out.at(0)->value;
-  for (unsigned i{0}; i < loops; ++i) {
-    in_a = rand_bi();
-    in_b = rand_bi();
+  vector<value_t> expected;
+  do {
+    net.set_input({rand_bi(), rand_bi()});
     net.process();
-    net.learn(learning_rate, {value_t((in_a > 0.5) ^ (in_b > 0.5))});
-  }
-  in_a = 1;
-  in_b = 1;
+    expected.clear();
+    expected.push_back(value_t((in_a > 0.5) ^ (in_b > 0.5)));
+    net.learn(learning_rate, expected);
+  } while (net.mse(expected) > min_mse);
+  net.set_input({1, 1});
   net.process();
-  EXPECT_NEAR(out_c, 0, 0.2);
-  in_a = 1;
-  in_b = 0;
+  EXPECT_NEAR(out_c, 0, 0.5);
+  net.set_input({1, 0});
   net.process();
-  EXPECT_NEAR(out_c, 1, 0.2);
-  in_a = 0;
-  in_b = 1;
+  EXPECT_NEAR(out_c, 1, 0.5);
+  net.set_input({0, 1});
   net.process();
-  EXPECT_NEAR(out_c, 1, 0.2);
-  in_a = 0;
-  in_b = 0;
+  EXPECT_NEAR(out_c, 1, 0.5);
+  net.set_input({0, 0});
   net.process();
-  EXPECT_NEAR(out_c, 0, 0.2);
+  EXPECT_NEAR(out_c, 0, 0.5);
 }
