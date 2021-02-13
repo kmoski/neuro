@@ -1,67 +1,41 @@
 #ifndef NEURAL_NET_H_AA95F39400E2461FA380529F9623080D
 #define NEURAL_NET_H_AA95F39400E2461FA380529F9623080D
 
-// Unix
-#include <unistd.h>
-
-#include <vector>
 #include "neuron.h"
-
-using std::vector;
 
 namespace neuro {
 
+/**
+ * @brief struct for building NN
+ */
+struct net_config {
+  vector<neuron *> in{};  ///> input neuron IDs
+  vector<neuron *> out{};  ///> output neuron IDs
+  vector<connection *> connections{};  ///> connections in NN ()
+};
+
+/**
+ * @brief todo
+ */
 class neural_net {
-  /*
-   * - Linux, Solaris, AIX, OS X >= 10.4:
-   *
-   * sysconf(_SC_NPROCESSORS_ONLN);
-   * Или прочитать в /proc/cpuinfo (для LSB-совместимых дистрибутивов).
-   *
-   *
-   * - FreeBSD, OS X/Darwin, NetBSD, OpenBSD и их *BSD-сородичи:
-   *
-   * int mib[4] = {CTL_HW, HW_AVAILCPU, 0, 0};
-   * size_t len = sizeof(numCPU);
-   * sysctl(mib, 2, &numCPU, &len, NULL, 0);
-   * if (numCPU < 0) {
-   *     mib[1] = HW_NCPU;
-   *     sysctl(mib, 2, &numCPU, &len, NULL, 0);
-   * }
-   *
-   *
-   * - HPUX:
-   *
-   * mpctl(MPC_GETNUMSPUS, NULL, NULL)
-   *
-   *
-   * - IRIX:
-   *
-   * sysconf(_SC_NPROC_ONLN)
-   *
-   *
-   * - OS X >= 10.5 (на Objective-C):
-   *
-   * NSUInteger a = [[NSProcessInfo processInfo] processorCount];
-   * NSUInteger b = [[NSProcessInfo processInfo] activeProcessorCount];
-   *
-   *
-   * - Windows
-   *
-   * SYSTEM_INFO sysinfo;
-   * GetSystemInfo(&sysinfo);
-   *
-   * numCPU = sysinfo.dwNumberOfProcessors;
-   */
-  static const long num_proc_;  ///> Number of processor cores
+  static void process_(neuron *n);
+  static void learn_head_(neuron *n, const value_t &rate, const value_t &expected);
+  static void learn_(neuron *n, const value_t &rate);
+ protected:
+  neural_net() = default;
+  vector<neuron *> in_{};
+  vector<neuron *> out_{};
+  vector<neuron *> neurons_{};
+  vector<connection *> connections_{};
  public:
-  vector<neuron *> in{};
-  vector<neuron *> out{};
+  explicit neural_net(net_config *config);
+  ~neural_net();
+  void build(net_config *config);
   void process();
   void set_input(const vector<value_t> &expected);
-  vector<value_t> get_output();
-  void learn(const value_t &rate, const vector<value_t> &expected);
-  value_t mse(const vector<value_t> &expected);
+  vector<value_t> get_input() const noexcept; // NOLINT(modernize-use-nodiscard)
+  vector<value_t> get_output() const noexcept; // NOLINT(modernize-use-nodiscard)
+  value_t learn(const value_t &rate, const vector<value_t> &expected);
 };
 
 }

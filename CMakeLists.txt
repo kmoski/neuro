@@ -1,47 +1,40 @@
-cmake_minimum_required(VERSION 3.17)
+cmake_minimum_required(VERSION 3.16)
 project(neuro)
-
 set(CMAKE_CXX_STANDARD 20)
 
-set(PROJECT_MAIN_ENTRY main.cpp)
+# neuro
 
-set(PROJECT_SOURCE
-    src/neuron.h src/neuron.cpp
-    src/def.h
-    src/builder.h src/builder.cpp
-    src/neural_net.h src/neural_net.cpp
-    )
+set(TARGET_NEURO neuro)
+add_library(${TARGET_NEURO} STATIC)
+set(NEURO_SOURCE
+    src/neuron.h
+    src/neural_net.h src/neural_net.cpp)
+target_sources(${TARGET_NEURO}
+    PUBLIC ${NEURO_SOURCE})
 
-add_executable(${PROJECT_NAME} ${PROJECT_MAIN_ENTRY} ${PROJECT_SOURCE})
-
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/inc)
-
-# Tests
+# tests
 
 find_package(GTest)
 enable_testing()
 
-set(TARGET_UNIT_TESTS ${PROJECT_NAME}_unit)
-
+set(TARGET_TESTS ${TARGET_NEURO}_test)
+add_executable(${TARGET_TESTS})
 set(TEST_MAIN_ENTRY
     test/main.cpp)
+set(UNIT_SOURCE
+    test/unit/neural_net.h test/unit/neural_net.cpp)
+add_dependencies(${TARGET_TESTS} ${TARGET_NEURO})
+target_sources(${TARGET_TESTS}
+    PRIVATE ${TEST_MAIN_ENTRY}
+    PUBLIC ${UNIT_SOURCE})
+target_include_directories(${TARGET_TESTS}
+    PRIVATE ${GTEST_INCLUDE_DIR})
+target_link_libraries(${TARGET_TESTS}
+    ${TARGET_NEURO}
+    gtest
+    gtest_main
+    pthread)
 
-set(TEST_UNIT_SOURCE
-    test/unit/builder.cpp test/unit/neural_net.cpp)
-
-add_test(NAME ${TARGET_UNIT_TESTS}
-         COMMAND ${TARGET_UNIT_TESTS})
-
-add_executable(${TARGET_UNIT_TESTS}
-               ${TEST_MAIN_ENTRY}
-               ${TEST_UNIT_SOURCE}
-               ${PROJECT_SOURCE})
-
-target_include_directories(${TARGET_UNIT_TESTS} PUBLIC
-                           ${GTEST_INCLUDE_DIR}
-                           ${PROJECT_SOURCE_DIR}/include)
-
-target_link_libraries(${TARGET_UNIT_TESTS}
-                      gtest
-                      gtest_main
-                      pthread)
+set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR})
+install(TARGETS ${TARGET_TESTS} RUNTIME)
+install(TARGETS ${TARGET_NEURO} LIBRARY)

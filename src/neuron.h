@@ -2,14 +2,12 @@
 #define NEURON_H_7998EAD204184E6689A5C9FEDD27D51F
 
 #include <vector>
-#include <cstdint>
-#include "def.h"
 
 using std::vector;
 
 namespace neuro {
 
-typedef uintptr_t neuron_id;
+typedef double value_t;
 
 class neuron;
 
@@ -30,9 +28,6 @@ struct neuron {
   vector<connection *> out{};  ///> output connections
   value_t value{0};  ///> computing value
   value_t delta{0};  ///> delta weight for learning
-  void process();
-  void learn_head(const value_t &rate, const value_t &expected);
-  void learn(const value_t &rate);
 };
 
 }
